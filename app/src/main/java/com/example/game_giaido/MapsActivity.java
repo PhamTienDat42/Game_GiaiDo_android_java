@@ -28,6 +28,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -93,7 +95,10 @@ public class MapsActivity extends AppCompatActivity implements
     private Map<Marker, Question> markerQuestionMap = new HashMap<>();
     private String selectedAnswer = null;
     private int currentScore;
+    private float currentTime;
     private Marker selectedMarker;
+    private Handler dialogHandler = new Handler();
+    private float dialogTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,13 +113,20 @@ public class MapsActivity extends AppCompatActivity implements
         searchView.clearFocus();
 
         currentScore = getIntent().getIntExtra("score", 0);
+        currentTime = getIntent().getFloatExtra("time", 0.0f);
         ButtonQuit = findViewById(R.id.btnquit);
         ButtonQuit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //new score
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("newScore", currentScore);
+                //setResult(RESULT_OK, resultIntent);
+                //new timer
+                resultIntent.putExtra("additionalTime", currentTime);
+
                 setResult(RESULT_OK, resultIntent);
+
                 finish(); // Kết thúc MapsActivity và trả về kết quả
             }
         });
@@ -173,73 +185,74 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sensorManager.unregisterListener(accelerometerListener);
-        sensorManager.unregisterListener(magnetometerListener);
+        //sensorManager.unregisterListener(accelerometerListener);
+        //sensorManager.unregisterListener(magnetometerListener);
+        dialogHandler.removeCallbacksAndMessages(null);
     }
 
-    private final SensorEventListener accelerometerListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                System.arraycopy(event.values, 0, accelerometerValues, 0, 3);
-                updateCompassOrientation();
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // Xử lý thay đổi độ chính xác của cảm biến nếu cần
-        }
-    };
-
-    private final SensorEventListener magnetometerListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                System.arraycopy(event.values, 0, magnetometerValues, 0, 3);
-                updateCompassOrientation();
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // Xử lý thay đổi độ chính xác của cảm biến nếu cần
-        }
-    };
-
-    private void updateCompassOrientation() {
-        SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerValues, magnetometerValues);
-        float azimuth = (float) Math.toDegrees(SensorManager.getOrientation(rotationMatrix, orientationValues)[0]);
-        updateMapBearing(azimuth);
-    }
-
-    // Phương thức cập nhật hướng trên Google Map
-    private void updateMapBearing(float bearing) {
-        if (gMap != null) {
-            gMap.animateCamera(CameraUpdateFactory.newCameraPosition(
-                    new CameraPosition.Builder().target(gMap.getCameraPosition().target)
-                            .zoom(gMap.getCameraPosition().zoom)
-                            .bearing(bearing)
-                            .tilt(gMap.getCameraPosition().tilt)
-                            .build()));
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (accelerometer != null && magnetometer != null) {
-            sensorManager.registerListener(accelerometerListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-            sensorManager.registerListener(magnetometerListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        sensorManager.unregisterListener(accelerometerListener);
-        sensorManager.unregisterListener(magnetometerListener);
-    }
+//    private final SensorEventListener accelerometerListener = new SensorEventListener() {
+//        @Override
+//        public void onSensorChanged(SensorEvent event) {
+//            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+//                System.arraycopy(event.values, 0, accelerometerValues, 0, 3);
+//                updateCompassOrientation();
+//            }
+//        }
+//
+//        @Override
+//        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+//            // Xử lý thay đổi độ chính xác của cảm biến nếu cần
+//        }
+//    };
+//
+//    private final SensorEventListener magnetometerListener = new SensorEventListener() {
+//        @Override
+//        public void onSensorChanged(SensorEvent event) {
+//            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+//                System.arraycopy(event.values, 0, magnetometerValues, 0, 3);
+//                updateCompassOrientation();
+//            }
+//        }
+//
+//        @Override
+//        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+//            // Xử lý thay đổi độ chính xác của cảm biến nếu cần
+//        }
+//    };
+//
+//    private void updateCompassOrientation() {
+//        SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerValues, magnetometerValues);
+//        float azimuth = (float) Math.toDegrees(SensorManager.getOrientation(rotationMatrix, orientationValues)[0]);
+//        updateMapBearing(azimuth);
+//    }
+//
+//    // Phương thức cập nhật hướng trên Google Map
+//    private void updateMapBearing(float bearing) {
+//        if (gMap != null) {
+//            gMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+//                    new CameraPosition.Builder().target(gMap.getCameraPosition().target)
+//                            .zoom(gMap.getCameraPosition().zoom)
+//                            .bearing(bearing)
+//                            .tilt(gMap.getCameraPosition().tilt)
+//                            .build()));
+//        }
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if (accelerometer != null && magnetometer != null) {
+//            sensorManager.registerListener(accelerometerListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+//            sensorManager.registerListener(magnetometerListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+//        }
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        sensorManager.unregisterListener(accelerometerListener);
+//        sensorManager.unregisterListener(magnetometerListener);
+//    }
 
     private void getLocation() {
         if (ActivityCompat.checkSelfPermission(
@@ -554,11 +567,14 @@ public class MapsActivity extends AppCompatActivity implements
                     // Đúng
                     //currentScore = getIntent().getIntExtra("score", 0);
                     currentScore = currentScore + 10;
+                    currentTime += dialogTime;
                     Toast.makeText(MapsActivity.this, "Câu trả lời đúng!" + currentScore, Toast.LENGTH_SHORT).show();
 
                     // Trả về kết quả cho ProfileActivity
                     Intent resultIntent = new Intent();
                     resultIntent.putExtra("newScore", currentScore);
+                    resultIntent.putExtra("additionalTime", currentTime);
+
                     setResult(RESULT_OK, resultIntent);
                 } else {
                     // Sai
@@ -580,5 +596,23 @@ public class MapsActivity extends AppCompatActivity implements
 
         // Đặt lại biến toàn cục để tránh ẩn đi nhiều lần
         selectedMarker = null;
+
+        // Tham chiếu đến TextView đếm ngược
+        TextView countdownTimer = dialog.findViewById(R.id.countdownTimer);
+
+        new CountDownTimer(30000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                // Cập nhật đếm ngược trên TextView
+                countdownTimer.setText(millisUntilFinished / 1000 + "s");
+                dialogTime = 30 - millisUntilFinished / 1000;
+            }
+
+            public void onFinish() {
+                // Đóng dialog sau khi đã trôi qua 30 giây
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+            }
+        }.start();
     }
 }

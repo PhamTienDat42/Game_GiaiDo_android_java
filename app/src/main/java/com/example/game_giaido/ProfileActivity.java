@@ -112,6 +112,7 @@ public class ProfileActivity extends AppCompatActivity {
             profileRank.setText(String.valueOf(rankUser));
             profileScore.setText(String.valueOf(scoreUser));
             profileTime.setText(String.valueOf(timeUser));
+
         }
     }
 
@@ -162,11 +163,13 @@ public class ProfileActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     Integer scoreDB = snapshot.child(userUsername).child("score").getValue(Integer.class);
                     String usernameFromDB = snapshot.child(userUsername).child("username").getValue(String.class);
+                    float timeDB = snapshot.child(userUsername).child("time").getValue(Float.class);
 
                     Intent intent = new Intent(ProfileActivity.this, MapsActivity.class);
 
                     intent.putExtra("score", scoreDB);
                     intent.putExtra("username", usernameFromDB);
+                    intent.putExtra("time", timeDB);
 
                     startActivityForResult(intent, 1); // Sử dụng startActivityForResult để nhận kết quả từ MapsActivity
                 }
@@ -187,9 +190,17 @@ public class ProfileActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Nhận dữ liệu trả về từ MapsActivity
                 int newScore = data.getIntExtra("newScore", 0);
+                float additionalTime = data.getFloatExtra("additionalTime", 0.0f);
+
+                // Cập nhật thời gian trên giao diện
+                //float currentTime = Float.parseFloat(profileTime.getText().toString());
+                float updatedTime = additionalTime;
+                profileTime.setText(String.valueOf(updatedTime));
+
+                updateScoreAndTimeOnFirebase(profileUsername.getText().toString(), newScore, additionalTime);
 
                 // Cập nhật điểm trên Firebase
-                updateScoreOnFirebase(profileUsername.getText().toString(), newScore);
+                //updateScoreOnFirebase(profileUsername.getText().toString(), newScore);
 
                 // Cập nhật điểm trên giao diện
                 profileScore.setText(String.valueOf(newScore));
@@ -214,6 +225,25 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Lỗi khi cập nhật điểm
+                    }
+                });
+    }
+
+    private void updateScoreAndTimeOnFirebase(String username, int newScore, float additionalTime) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(username);
+
+        userRef.child("score").setValue(newScore);
+        userRef.child("time").setValue(additionalTime)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Điểm và thời gian đã được cập nhật thành công
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Lỗi khi cập nhật điểm và thời gian
                     }
                 });
     }

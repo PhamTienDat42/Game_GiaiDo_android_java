@@ -48,7 +48,8 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.ViewHolder> {
 
         // Thiết lập giá trị cho textUsername và textScore
         holder.textUsername.setText(player.getUsername() + " ");
-        holder.textScore.setText("Score: " + player.getScore());
+        holder.textScore.setText("Score: " + player.getScore() + " ");
+        holder.textTime.setText("Time: " + player.getTime());
     }
 
     @Override
@@ -57,7 +58,7 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textRank, textUsername, textScore;
+        TextView textRank, textUsername, textScore, textTime;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -66,6 +67,7 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.ViewHolder> {
             textRank = itemView.findViewById(R.id.textRank);
             textUsername = itemView.findViewById(R.id.textUsername);
             textScore = itemView.findViewById(R.id.textScore);
+            textTime = itemView.findViewById(R.id.textTime);
         }
     }
 }

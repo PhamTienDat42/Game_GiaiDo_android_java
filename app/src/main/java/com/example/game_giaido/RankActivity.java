@@ -42,11 +42,18 @@ public class RankActivity extends AppCompatActivity {
                     playerList.add(player);
                 }
 
-                // Sắp xếp danh sách người chơi theo điểm giảm dần
                 Collections.sort(playerList, new Comparator<HelperClass>() {
                     @Override
                     public int compare(HelperClass player1, HelperClass player2) {
-                        return Integer.compare(player2.getScore(), player1.getScore());
+                        // So sánh điểm giảm dần
+                        int scoreComparison = Integer.compare(player2.getScore(), player1.getScore());
+
+                        if (scoreComparison != 0) {
+                            return scoreComparison;
+                        } else {
+                            // Nếu điểm bằng nhau, so sánh thời gian giảm dần
+                            return Float.compare(player1.getTime(), player2.getTime());
+                        }
                     }
                 });
 

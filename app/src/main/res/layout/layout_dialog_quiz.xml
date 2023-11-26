@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/white_background"
-    android:orientation="vertical"
     android:layout_margin="16dp">
 
     <TextView
+        android:id="@+id/dialogHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:textColor="@color/black"
-        android:textSize="16dp"
-        android:gravity="center"
         android:background="@drawable/bg_yellow_comer_16_top_left_top_right"
-        android:text="Câu đố"/>
+        android:gravity="center"
+        android:padding="12dp"
+        android:textStyle="bold"
+        android:text="Câu đố"
+        android:textColor="@color/black"
+        android:textSize="26dp" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/dialogHeader"
         android:padding="16dp"
         android:orientation="vertical">
 
@@ -74,4 +76,15 @@
             android:text="Trả lời"
             android:layout_marginTop="40dp"/>
     </LinearLayout>
-</LinearLayout>
+    <TextView
+        android:id="@+id/countdownTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="30s"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"/>
+</RelativeLayout>
