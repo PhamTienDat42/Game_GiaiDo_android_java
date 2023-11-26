@@ -29,17 +29,17 @@ tools:context=".MapsActivity">
         android:id="@+id/search"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="12dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:iconifiedByDefault="false"
-        app:queryHint="Search location"
+        android:background="@drawable/lavendor_border"
         android:focusable="false"
         app:closeIcon="@drawable/baseline_clear_24"
-        app:searchIcon="@drawable/baseline_question_mark_24"
-        android:background="@drawable/lavendor_border" />
+        app:iconifiedByDefault="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="Search location"
+        app:searchIcon="@drawable/baseline_question_mark_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

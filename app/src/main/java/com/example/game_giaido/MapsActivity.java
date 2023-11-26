@@ -8,17 +8,27 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -32,6 +42,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -49,7 +60,7 @@ public class MapsActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
         OnMapReadyCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback{
+        ActivityCompat.OnRequestPermissionsResultCallback {
     FrameLayout map;
     GoogleMap gMap;
     Location currentLocation;
@@ -64,10 +75,10 @@ public class MapsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        map = findViewById(R.id.map);
-//        SupportMapFragment mapFragment =
-//                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
+        //map = findViewById(R.id.map);
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
         searchView = findViewById(R.id.search);
         searchView.clearFocus();
 
@@ -87,25 +98,25 @@ public class MapsActivity extends AppCompatActivity implements
             @Override
             public boolean onQueryTextSubmit(String query) {
                 String loc = searchView.getQuery().toString();
-                if (loc == null){
+                if (loc == null) {
                     Toast.makeText(MapsActivity.this, "Location Not Found", Toast.LENGTH_SHORT).show();
                 } else {
                     Geocoder geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
                     try {
                         List<Address> addressList = geocoder.getFromLocationName(loc, 1);
-                        if (addressList.size() > 0){
-                            LatLng latLng = new LatLng(addressList.get(0).getLatitude(),addressList.get(0).getLongitude());
-                            if (marker != null){
+                        if (addressList.size() > 0) {
+                            LatLng latLng = new LatLng(addressList.get(0).getLatitude(), addressList.get(0).getLongitude());
+                            if (marker != null) {
                                 marker.remove();
                             }
                             MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(loc);
                             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
-                            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng,5);
+                            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
                             gMap.animateCamera(cameraUpdate);
                             marker = gMap.addMarker(markerOptions);
                         }
-                    } catch (IOException e){
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -117,6 +128,18 @@ public class MapsActivity extends AppCompatActivity implements
                 return false;
             }
         });
+    }
+
+    // Phương thức cập nhật hướng trên Google Map
+    private void updateMapBearing(float bearing) {
+        if (gMap != null) {
+            gMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                    new CameraPosition.Builder().target(gMap.getCameraPosition().target)
+                            .zoom(gMap.getCameraPosition().zoom)
+                            .bearing(bearing)
+                            .tilt(gMap.getCameraPosition().tilt)
+                            .build()));
+        }
     }
 
     private void getLocation() {
@@ -141,7 +164,6 @@ public class MapsActivity extends AppCompatActivity implements
                     assert supportMapFragment != null;
                     supportMapFragment.getMapAsync(MapsActivity.this);
                 }
-
             }
         });
     }
@@ -159,15 +181,48 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.gMap = googleMap;
-        LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
-        googleMap.addMarker(markerOptions);
 
+        // Bật My Location
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        //gMap.setMyLocationEnabled(true);
 
-        // Tạo thêm 3 marker ở các vị trí cách 500m
-        createMarkersAroundCurrentLocation(googleMap);
+        // Bật Zoom Controls
+        //gMap.getUiSettings().setZoomControlsEnabled(true);
+
+        // Enable the compass
+        googleMap.getUiSettings().setCompassEnabled(true);
+
+//        LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+//        MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
+//        googleMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+//        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+//        googleMap.addMarker(markerOptions);
+//
+//
+//        // Tạo thêm 3 marker ở các vị trí cách 500m
+//        createMarkersAroundCurrentLocation(googleMap);
+        if (currentLocation != null) {
+            LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+            googleMap.addMarker(markerOptions);
+
+            // Tạo thêm 3 marker ở các vị trí cách 500m
+            createMarkersAroundCurrentLocation(googleMap);
+        } else {
+            // Xử lý trường hợp currentLocation là null, có thể thông báo lỗi hoặc thực hiện hành động phù hợp
+            Toast.makeText(this,"Khong tim duoc current location!", Toast.LENGTH_LONG);
+        }
     }
 
     private BitmapDescriptor bitmapDescriptor(Context context, int vectoerResId){
@@ -211,6 +266,13 @@ public class MapsActivity extends AppCompatActivity implements
 //        addMarker(nearbyLatLng1, "Location 1");
 //        addMarker(nearbyLatLng2, "Location 2");
 //        addMarker(nearbyLatLng3, "Location 3");
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                    openQuizDialog(Gravity.CENTER);
+                return false;
+            }
+        });
     }
 
     private LatLng calculateLatLng(LatLng source, double distance, float angle) {
@@ -241,11 +303,6 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE) {
@@ -256,10 +313,40 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onMyLocationClick(@NonNull Location location) {
+        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public boolean onMyLocationButtonClick() {
         Toast.makeText(this, "Đang di chuyển đến vị trí của bạn!", Toast.LENGTH_SHORT).show();
         // Trả về false để chúng ta không sử dụng sự kiện và hành vi mặc định vẫn xảy ra
         // (Camera hoạt hình theo vị trí hiện tại của người dùng).
         return false;
+    }
+
+    private void openQuizDialog(int gravity){
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_dialog_quiz);
+
+        Window window = dialog.getWindow();
+        if (window == null){
+            return;
+        }
+
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.gravity = gravity;
+        window.setAttributes(windowAttributes);
+
+        if (Gravity.CENTER == gravity){
+            dialog.setCancelable(true);
+        }else {
+            dialog.setCancelable(false);
+        }
+        dialog.show();
     }
 }
