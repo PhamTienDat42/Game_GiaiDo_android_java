@@ -46,6 +46,14 @@ public class ProfileActivity extends AppCompatActivity {
         editProfile = findViewById(R.id.editButton);
         showMap = findViewById(R.id.showMap);
 
+        profileRank.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, RankActivity.class);
+                startActivity(intent);
+            }
+        });
+
         showAllUserData();
 
         editProfile.setOnClickListener(new View.OnClickListener() {
@@ -58,8 +66,6 @@ public class ProfileActivity extends AppCompatActivity {
         showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(ProfileActivity.this, MapsActivity.class);
-//                startActivity(intent);
                 passUserDataToGame();
             }
         });
@@ -177,6 +183,9 @@ public class ProfileActivity extends AppCompatActivity {
 
                 // Cập nhật điểm trên giao diện
                 profileScore.setText(String.valueOf(newScore));
+
+                // Cập nhật rank trên Firebase và trên giao diện
+                updateRankOnFirebase(profileUsername.getText().toString(), newScore);
             }
         }
     }
@@ -199,4 +208,54 @@ public class ProfileActivity extends AppCompatActivity {
                 });
     }
 
+    private void updateRankOnFirebase(String username, int newScore) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(username);
+
+        userRef.child("score").setValue(newScore)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Điểm đã được cập nhật thành công
+                        // Gọi phương thức để cập nhật rank trên Firebase
+                        calculateAndUpdateRank();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Lỗi khi cập nhật điểm
+                    }
+                });
+    }
+
+    private void calculateAndUpdateRank() {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
+
+        usersRef.orderByChild("score").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int totalPlayers = (int) dataSnapshot.getChildrenCount();
+                int rank = totalPlayers;
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String username = snapshot.child("username").getValue(String.class);
+
+                    if (username.equals(profileUsername.getText().toString())) {
+                        // Cập nhật rank trên giao diện
+                        profileRank.setText(String.valueOf(rank));
+                        // Cập nhật rank trên Firebase
+                        snapshot.getRef().child("rank").setValue(rank);
+                        break;
+                    }
+
+                    rank--;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý lỗi nếu có
+            }
+        });
+    }
 }

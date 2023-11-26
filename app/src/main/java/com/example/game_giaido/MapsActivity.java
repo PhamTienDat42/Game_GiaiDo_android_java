@@ -680,7 +680,7 @@ public class MapsActivity extends AppCompatActivity implements
                 // Kiểm tra xem câu trả lời có đúng không
                 if (selectedAnswer != null && selectedAnswer.equals(question.getCorrectAnswer())) {
                     // Đúng
-                    currentScore = getIntent().getIntExtra("score", 0);
+                    //currentScore = getIntent().getIntExtra("score", 0);
                     currentScore = currentScore + 10;
                     Toast.makeText(MapsActivity.this, "Câu trả lời đúng!" + currentScore, Toast.LENGTH_SHORT).show();
 
