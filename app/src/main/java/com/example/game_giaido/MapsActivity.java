@@ -61,8 +61,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -88,6 +91,10 @@ public class MapsActivity extends AppCompatActivity implements
     private float[] magnetometerValues = new float[3];
     private float[] rotationMatrix = new float[9];
     private float[] orientationValues = new float[3];
+    private List<Question> questionList = new ArrayList<>();
+    private Map<Marker, Question> markerQuestionMap = new HashMap<>();
+
+    private String selectedAnswer = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -292,24 +299,24 @@ public class MapsActivity extends AppCompatActivity implements
 
         if (currentLocation != null) {
             LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
+            //MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
             googleMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng));
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
-            googleMap.addMarker(markerOptions);
+            //googleMap.addMarker(markerOptions);
 
             // Tạo thêm 3 marker ở các vị trí cách 500m
             createMarkersAroundCurrentLocation(googleMap);
         } else {
             // Xử lý trường hợp currentLocation là null, có thể thông báo lỗi hoặc thực hiện hành động phù hợp
-            //Toast.makeText(this,"Khong tim duoc current location!", Toast.LENGTH_LONG);
-            LatLng currentLatLng = new LatLng(20.9847, 105.8386);
-            MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
-            googleMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng));
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
-            googleMap.addMarker(markerOptions);
-
-            // Tạo thêm 3 marker ở các vị trí cách 500m
-            createMarkersAroundCurrentLocation(googleMap);
+            Toast.makeText(this,"Khong tim duoc current location!", Toast.LENGTH_LONG);
+//            LatLng currentLatLng = new LatLng(20.9847, 105.8386);
+//            MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
+//            googleMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+//            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+//            googleMap.addMarker(markerOptions);
+//
+//            // Tạo thêm 3 marker ở các vị trí cách 500m
+//            createMarkersAroundCurrentLocation(googleMap);
         }
     }
 
@@ -324,6 +331,75 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     private void createMarkersAroundCurrentLocation(GoogleMap googleMap) {
+        if (currentLocation == null) {
+            return;
+        }
+
+        // Xác định vị trí hiện tại
+        LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("questions");
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Lưu trữ danh sách câu hỏi từ Firebase vào biến toàn cục
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Question question = snapshot.getValue(Question.class);
+                    questionList.add(question);
+                }
+
+                Random random = new Random();
+
+                // Tạo marker cho mỗi câu hỏi
+                for (Question question : questionList) {
+                    // Tính toán vị trí mới cách 500m từ vị trí hiện tại
+                    LatLng quizLatLng = calculateLatLng(currentLatLng, 0.5, random.nextInt(360));
+
+                    MarkerOptions markerOptions = new MarkerOptions()
+                            .position(quizLatLng)
+                            .title("Vị trí câu đố")
+                            .icon(bitmapDescriptor(getApplicationContext(), R.drawable.hopcauhoi1));
+                    //googleMap.addMarker(markerOptions);
+                    Marker marker = googleMap.addMarker(markerOptions);
+                    // Thêm ánh xạ giữa Marker và Question vào Map
+                    markerQuestionMap.put(marker, question);
+                }
+
+                // Bắt sự kiện khi click vào marker
+//                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//                    @Override
+//                    public boolean onMarkerClick(@NonNull Marker marker) {
+//                        // Lấy câu hỏi tương ứng với marker được chọn
+//                        int markerIndex = Integer.parseInt(marker.getId().replace("m", ""));
+//                        Question selectedQuestion = questionList.get(markerIndex);
+//
+//                        // Hiển thị dialog với câu hỏi từ Firebase
+//                        openQuizDialog(Gravity.CENTER, selectedQuestion);
+//                        return false;
+//                    }
+//                });
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        // Lấy câu hỏi tương ứng với marker được chọn
+                        Question selectedQuestion = markerQuestionMap.get(marker);
+
+                        // Hiển thị dialog với câu hỏi từ Firebase
+                        openQuizDialog(Gravity.CENTER, selectedQuestion);
+                        return false;
+                    }
+                });
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Error: " + databaseError.getMessage());
+            }
+        });
+    }
+
+
+    private void createMarkersAroundCurrentLocation1(GoogleMap googleMap) {
         if (currentLocation == null) {
             return;
         }
@@ -515,4 +591,104 @@ public class MapsActivity extends AppCompatActivity implements
         dialog.show();
     }
 
+    private void openQuizDialog(int gravity, Question question) {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_dialog_quiz);
+
+        Window window = dialog.getWindow();
+        if (window == null) {
+            return;
+        }
+
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.gravity = gravity;
+        window.setAttributes(windowAttributes);
+
+        if (Gravity.CENTER == gravity) {
+            dialog.setCancelable(true);
+        } else {
+            dialog.setCancelable(false);
+        }
+
+        // Ánh xạ các thành phần trong layout của dialog
+        TextView questionTextView = dialog.findViewById(R.id.question);
+        Button answerA = dialog.findViewById(R.id.ans_A);
+        Button answerB = dialog.findViewById(R.id.ans_B);
+        Button answerC = dialog.findViewById(R.id.ans_C);
+        Button answerD = dialog.findViewById(R.id.ans_D);
+        Button submitButton = dialog.findViewById(R.id.submit_btn);
+
+        // Sử dụng đối tượng Question để hiển thị câu hỏi và câu trả lời trong dialog
+        questionTextView.setText(question.getQuestionText());
+        answerA.setText("A. " + question.getAnswerA());
+        answerB.setText("B. " + question.getAnswerB());
+        answerC.setText("C. " + question.getAnswerC());
+        answerD.setText("D. " + question.getAnswerD());
+
+        // Xử lý sự kiện khi người dùng nhấn nút Trả lời trong dialog
+//        submitButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // Xử lý logic khi người dùng trả lời câu hỏi
+//                // Ví dụ: Đóng dialog sau khi người dùng đã trả lời
+//                dialog.dismiss();
+//            }
+//        });
+
+        answerA.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Đặt logic xử lý khi nút A được nhấn
+                // Ví dụ: Đánh dấu nút A là đã chọn
+                selectedAnswer = "A";
+                // Bạn có thể thêm logic xử lý khác ở đây
+            }
+        });
+
+        answerB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedAnswer = "B";
+            }
+        });
+
+        answerC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedAnswer = "C";
+            }
+        });
+
+        answerD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedAnswer = "D";
+            }
+        });
+
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Kiểm tra xem câu trả lời có đúng không
+                if (selectedAnswer != null && selectedAnswer.equals(question.getCorrectAnswer())) {
+                    // Đúng
+                    Toast.makeText(MapsActivity.this, "Câu trả lời đúng!", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Sai
+                    Toast.makeText(MapsActivity.this, "Câu trả lời sai!" + selectedAnswer, Toast.LENGTH_SHORT).show();
+                }
+
+                // Đóng dialog sau khi người dùng đã trả lời
+                dialog.dismiss();
+            }
+        });
+
+        // Hiển thị dialog
+        dialog.show();
+    }
 }

@@ -7,9 +7,22 @@ public class Question {
     private String answerC;
     private String answerD;
     private String correctAnswer;
+    private double latitude;
+    private double longitude;
 
     // Empty constructor required for Firebase
     public Question() {
+    }
+
+    public Question(String questionText, String answerA, String answerB, String answerC, String answerD, String correctAnswer, double latitude, double longitude) {
+        this.questionText = questionText;
+        this.answerA = answerA;
+        this.answerB = answerB;
+        this.answerC = answerC;
+        this.answerD = answerD;
+        this.correctAnswer = correctAnswer;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Question(String questionText, String answerA, String answerB, String answerC, String answerD, String correctAnswer) {
@@ -67,5 +80,21 @@ public class Question {
 
     public void setCorrectAnswer(String correctAnswer) {
         this.correctAnswer = correctAnswer;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }
