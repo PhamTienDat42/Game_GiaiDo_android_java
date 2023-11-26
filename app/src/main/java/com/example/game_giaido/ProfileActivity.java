@@ -24,7 +24,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     TextView profileName, profileEmail, profileUsername, profilePassword, profileRank, profileScore, profileTime;
     TextView titleName, titleUsername;
-    Button editProfile, showMap, showMapFragment;
+    Button editProfile, showMap, signOut;
 
     //FrameLayout map;
 
@@ -45,6 +45,16 @@ public class ProfileActivity extends AppCompatActivity {
         titleUsername = findViewById(R.id.titleUsername);
         editProfile = findViewById(R.id.editButton);
         showMap = findViewById(R.id.showMap);
+        signOut = findViewById(R.id.signOutButton);
+
+        signOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
 
         profileRank.setOnClickListener(new View.OnClickListener() {
             @Override
