@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1051281552611",
+    "project_id": "game-giaido",
+    "storage_bucket": "game-giaido.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051281552611:android:1ed4ff0d7c40075794c1d6",
+        "android_client_info": {
+          "package_name": "com.example.game_giaido"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATugQa4GiGQuPKOWdq1zGezL1gQ1nB1zE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
