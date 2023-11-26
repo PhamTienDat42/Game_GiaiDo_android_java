@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -22,10 +25,10 @@ import com.google.firebase.database.ValueEventListener;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    TextView profileName, profileEmail, profileUsername, profilePassword, profileRank, profileScore, profileTime;
+    TextView profileName, profileEmail, profileUsername, profileRank, profileScore, profileTime, profilePassword;
     TextView titleName, titleUsername;
     Button editProfile, showMap, signOut;
-
+    //EditText profilePassword;
     //FrameLayout map;
 
     @Override
@@ -46,6 +49,25 @@ public class ProfileActivity extends AppCompatActivity {
         editProfile = findViewById(R.id.editButton);
         showMap = findViewById(R.id.showMap);
         signOut = findViewById(R.id.signOutButton);
+
+        //ImageButton showPasswordButton = findViewById(R.id.showPasswordButton);
+        //profilePassword = findViewById(R.id.profilePassword);
+//        showPasswordButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // Đảo ngược trạng thái hiển thị mật khẩu
+//                if (profilePassword.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
+//                    profilePassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//                    showPasswordButton.setImageResource(R.drawable.hopcauhoi1);
+//                } else {
+//                    profilePassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+//                    showPasswordButton.setImageResource(R.drawable.ic_baseline_lock_24);
+//                }
+//
+//                // Di chuyển con trỏ về cuối chuỗi mật khẩu
+//                profilePassword.setSelection(profilePassword.getText().length());
+//            }
+//        });
 
         signOut.setOnClickListener(new View.OnClickListener() {
             @Override
