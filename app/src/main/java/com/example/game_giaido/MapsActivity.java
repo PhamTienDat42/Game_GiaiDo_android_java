@@ -369,19 +369,6 @@ public class MapsActivity extends AppCompatActivity implements
                     markerQuestionMap.put(marker, question);
                 }
 
-                // Bắt sự kiện khi click vào marker
-//                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//                    @Override
-//                    public boolean onMarkerClick(@NonNull Marker marker) {
-//                        // Lấy câu hỏi tương ứng với marker được chọn
-//                        int markerIndex = Integer.parseInt(marker.getId().replace("m", ""));
-//                        Question selectedQuestion = questionList.get(markerIndex);
-//
-//                        // Hiển thị dialog với câu hỏi từ Firebase
-//                        openQuizDialog(Gravity.CENTER, selectedQuestion);
-//                        return false;
-//                    }
-//                });
                 googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker) {
@@ -402,45 +389,45 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
 
-    private void createMarkersAroundCurrentLocation1(GoogleMap googleMap) {
-        if (currentLocation == null) {
-            return;
-        }
-
-        // Xác định vị trí hiện tại
-        LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        //LatLng currentLatLng = new LatLng(20.984350, 105.841360);
-        // Tính toán khoảng cách 500m theo các hướng khác nhau (0, 90, 180, 270 độ)
-//        Random random = new Random();
+//    private void createMarkersAroundCurrentLocation1(GoogleMap googleMap) {
+//        if (currentLocation == null) {
+//            return;
+//        }
 //
-//        LatLng nearbyLatLng1 = calculateLatLng(currentLatLng, 0.5, random.nextInt(360));
-//        LatLng nearbyLatLng2 = calculateLatLng(currentLatLng, 0.5, random.nextInt(360));
-//        LatLng nearbyLatLng3 = calculateLatLng(currentLatLng, 0.5, random.nextInt(360));
-        LatLng nearbyLatLng1 = calculateLatLng(currentLatLng, 0.5, 0);
-        LatLng nearbyLatLng2 = calculateLatLng(currentLatLng, 0.5, 90);
-        LatLng nearbyLatLng3 = calculateLatLng(currentLatLng, 0.5, 180);
-
-        LatLng quiz = new LatLng(nearbyLatLng1.latitude, nearbyLatLng1.longitude);
-        googleMap.addMarker(new MarkerOptions().position(quiz).title("Vị trí câu đố")
-                .icon(bitmapDescriptor(getApplicationContext(),R.drawable.hopcauhoi1)));
-        LatLng quiz1 = new LatLng(nearbyLatLng2.latitude, nearbyLatLng2.longitude);
-        googleMap.addMarker(new MarkerOptions().position(quiz1).title("Vị trí câu đố")
-                .icon(bitmapDescriptor(getApplicationContext(),R.drawable.hopcauhoi1)));
-        LatLng quiz2 = new LatLng(nearbyLatLng3.latitude, nearbyLatLng3.longitude);
-        googleMap.addMarker(new MarkerOptions().position(quiz2).title("Vị trí câu đố")
-                .icon(bitmapDescriptor(getApplicationContext(),R.drawable.hopcauhoi1)));
-        // Tạo marker cho các vị trí tính toán được
-//        addMarker(nearbyLatLng1, "Location 1");
-//        addMarker(nearbyLatLng2, "Location 2");
-//        addMarker(nearbyLatLng3, "Location 3");
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(@NonNull Marker marker) {
-                openQuizDialog(Gravity.CENTER);
-                return false;
-            }
-        });
-    }
+//        // Xác định vị trí hiện tại
+//        LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+//        //LatLng currentLatLng = new LatLng(20.984350, 105.841360);
+//        // Tính toán khoảng cách 500m theo các hướng khác nhau (0, 90, 180, 270 độ)
+////        Random random = new Random();
+////
+////        LatLng nearbyLatLng1 = calculateLatLng(currentLatLng, 0.5, random.nextInt(360));
+////        LatLng nearbyLatLng2 = calculateLatLng(currentLatLng, 0.5, random.nextInt(360));
+////        LatLng nearbyLatLng3 = calculateLatLng(currentLatLng, 0.5, random.nextInt(360));
+//        LatLng nearbyLatLng1 = calculateLatLng(currentLatLng, 0.5, 0);
+//        LatLng nearbyLatLng2 = calculateLatLng(currentLatLng, 0.5, 90);
+//        LatLng nearbyLatLng3 = calculateLatLng(currentLatLng, 0.5, 180);
+//
+//        LatLng quiz = new LatLng(nearbyLatLng1.latitude, nearbyLatLng1.longitude);
+//        googleMap.addMarker(new MarkerOptions().position(quiz).title("Vị trí câu đố")
+//                .icon(bitmapDescriptor(getApplicationContext(),R.drawable.hopcauhoi1)));
+//        LatLng quiz1 = new LatLng(nearbyLatLng2.latitude, nearbyLatLng2.longitude);
+//        googleMap.addMarker(new MarkerOptions().position(quiz1).title("Vị trí câu đố")
+//                .icon(bitmapDescriptor(getApplicationContext(),R.drawable.hopcauhoi1)));
+//        LatLng quiz2 = new LatLng(nearbyLatLng3.latitude, nearbyLatLng3.longitude);
+//        googleMap.addMarker(new MarkerOptions().position(quiz2).title("Vị trí câu đố")
+//                .icon(bitmapDescriptor(getApplicationContext(),R.drawable.hopcauhoi1)));
+//        // Tạo marker cho các vị trí tính toán được
+////        addMarker(nearbyLatLng1, "Location 1");
+////        addMarker(nearbyLatLng2, "Location 2");
+////        addMarker(nearbyLatLng3, "Location 3");
+//        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(@NonNull Marker marker) {
+//                openQuizDialog(Gravity.CENTER);
+//                return false;
+//            }
+//        });
+//    }
 
     private LatLng calculateLatLng(LatLng source, double distance, float angle) {
         double radiusEarth = 6371; // Đường kính trái đất trong km
@@ -492,107 +479,107 @@ public class MapsActivity extends AppCompatActivity implements
         return false;
     }
 
-    private void openQuizDialog1(int gravity){
-        final Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.layout_dialog_quiz);
+//    private void openQuizDialog1(int gravity){
+//        final Dialog dialog = new Dialog(this);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialog.setContentView(R.layout.layout_dialog_quiz);
+//
+//        Window window = dialog.getWindow();
+//        if (window == null){
+//            return;
+//        }
+//
+//        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+//        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//
+//        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+//        windowAttributes.gravity = gravity;
+//        window.setAttributes(windowAttributes);
+//
+//        if (Gravity.CENTER == gravity){
+//            dialog.setCancelable(true);
+//        }else {
+//            dialog.setCancelable(false);
+//        }
+//        dialog.show();
+//    }
 
-        Window window = dialog.getWindow();
-        if (window == null){
-            return;
-        }
-
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        WindowManager.LayoutParams windowAttributes = window.getAttributes();
-        windowAttributes.gravity = gravity;
-        window.setAttributes(windowAttributes);
-
-        if (Gravity.CENTER == gravity){
-            dialog.setCancelable(true);
-        }else {
-            dialog.setCancelable(false);
-        }
-        dialog.show();
-    }
-
-    private void openQuizDialog(int gravity) {
-        final Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.layout_dialog_quiz);
-
-        Window window = dialog.getWindow();
-        if (window == null) {
-            return;
-        }
-
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        WindowManager.LayoutParams windowAttributes = window.getAttributes();
-        windowAttributes.gravity = gravity;
-        window.setAttributes(windowAttributes);
-
-        if (Gravity.CENTER == gravity) {
-            dialog.setCancelable(true);
-        } else {
-            dialog.setCancelable(false);
-        }
-
-        // Ánh xạ các thành phần trong layout của dialog
-        TextView questionTextView = dialog.findViewById(R.id.question);
-        Button answerA = dialog.findViewById(R.id.ans_A);
-        Button answerB = dialog.findViewById(R.id.ans_B);
-        Button answerC = dialog.findViewById(R.id.ans_C);
-        Button answerD = dialog.findViewById(R.id.ans_D);
-        Button submitButton = dialog.findViewById(R.id.submit_btn);
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("questions");
-
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                long count = dataSnapshot.getChildrenCount();
-                Random random = new Random();
-                long randomNumber = random.nextInt((int) count);
-
-                DataSnapshot randomQuestionSnapshot = dataSnapshot.getChildren().iterator().next();
-
-                // Lấy dữ liệu của câu hỏi từ Firebase
-                String questionText = randomQuestionSnapshot.child("questionText").getValue(String.class);
-                String answerAText = randomQuestionSnapshot.child("answerA").getValue(String.class);
-                String answerBText = randomQuestionSnapshot.child("answerB").getValue(String.class);
-                String answerCText = randomQuestionSnapshot.child("answerC").getValue(String.class);
-                String answerDText = randomQuestionSnapshot.child("answerD").getValue(String.class);
-
-                // Hiển thị dữ liệu lên TextView và Button trong dialog
-                questionTextView.setText(questionText);
-                answerA.setText("A. " + answerAText);
-                answerB.setText("B. " + answerBText);
-                answerC.setText("C. " + answerCText);
-                answerD.setText("D. " + answerDText);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Error: " + databaseError.getMessage());
-            }
-        });
-
-        // Xử lý sự kiện khi người dùng nhấn nút Trả lời trong dialog
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Xử lý logic khi người dùng trả lời câu hỏi
-                // Ví dụ: Đóng dialog sau khi người dùng đã trả lời
-                dialog.dismiss();
-            }
-        });
-
-        // Hiển thị dialog
-        dialog.show();
-    }
+//    private void openQuizDialog(int gravity) {
+//        final Dialog dialog = new Dialog(this);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialog.setContentView(R.layout.layout_dialog_quiz);
+//
+//        Window window = dialog.getWindow();
+//        if (window == null) {
+//            return;
+//        }
+//
+//        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+//        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//
+//        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+//        windowAttributes.gravity = gravity;
+//        window.setAttributes(windowAttributes);
+//
+//        if (Gravity.CENTER == gravity) {
+//            dialog.setCancelable(true);
+//        } else {
+//            dialog.setCancelable(false);
+//        }
+//
+//        // Ánh xạ các thành phần trong layout của dialog
+//        TextView questionTextView = dialog.findViewById(R.id.question);
+//        Button answerA = dialog.findViewById(R.id.ans_A);
+//        Button answerB = dialog.findViewById(R.id.ans_B);
+//        Button answerC = dialog.findViewById(R.id.ans_C);
+//        Button answerD = dialog.findViewById(R.id.ans_D);
+//        Button submitButton = dialog.findViewById(R.id.submit_btn);
+//
+//        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("questions");
+//
+//        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                long count = dataSnapshot.getChildrenCount();
+//                Random random = new Random();
+//                long randomNumber = random.nextInt((int) count);
+//
+//                DataSnapshot randomQuestionSnapshot = dataSnapshot.getChildren().iterator().next();
+//
+//                // Lấy dữ liệu của câu hỏi từ Firebase
+//                String questionText = randomQuestionSnapshot.child("questionText").getValue(String.class);
+//                String answerAText = randomQuestionSnapshot.child("answerA").getValue(String.class);
+//                String answerBText = randomQuestionSnapshot.child("answerB").getValue(String.class);
+//                String answerCText = randomQuestionSnapshot.child("answerC").getValue(String.class);
+//                String answerDText = randomQuestionSnapshot.child("answerD").getValue(String.class);
+//
+//                // Hiển thị dữ liệu lên TextView và Button trong dialog
+//                questionTextView.setText(questionText);
+//                answerA.setText("A. " + answerAText);
+//                answerB.setText("B. " + answerBText);
+//                answerC.setText("C. " + answerCText);
+//                answerD.setText("D. " + answerDText);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                Log.e("Firebase", "Error: " + databaseError.getMessage());
+//            }
+//        });
+//
+//        // Xử lý sự kiện khi người dùng nhấn nút Trả lời trong dialog
+//        submitButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // Xử lý logic khi người dùng trả lời câu hỏi
+//                // Ví dụ: Đóng dialog sau khi người dùng đã trả lời
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        // Hiển thị dialog
+//        dialog.show();
+//    }
 
     private void openQuizDialog(int gravity, Question question) {
         final Dialog dialog = new Dialog(this);
@@ -631,16 +618,6 @@ public class MapsActivity extends AppCompatActivity implements
         answerB.setText("B. " + question.getAnswerB());
         answerC.setText("C. " + question.getAnswerC());
         answerD.setText("D. " + question.getAnswerD());
-
-        // Xử lý sự kiện khi người dùng nhấn nút Trả lời trong dialog
-//        submitButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // Xử lý logic khi người dùng trả lời câu hỏi
-//                // Ví dụ: Đóng dialog sau khi người dùng đã trả lời
-//                dialog.dismiss();
-//            }
-//        });
 
         answerA.setOnClickListener(new View.OnClickListener() {
             @Override

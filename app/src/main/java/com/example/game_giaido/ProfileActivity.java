@@ -80,15 +80,15 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        Button buttonAddQuestion = findViewById(R.id.buttonAddQuestion);
-        buttonAddQuestion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Chuyển sang AddQuestionActivity
-                Intent intent = new Intent(ProfileActivity.this, AddQuestionActivity.class);
-                startActivity(intent);
-            }
-        });
+//        Button buttonAddQuestion = findViewById(R.id.buttonAddQuestion);
+//        buttonAddQuestion.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // Chuyển sang AddQuestionActivity
+//                Intent intent = new Intent(ProfileActivity.this, AddQuestionActivity.class);
+//                startActivity(intent);
+//            }
+//        });
     }
 
     public void showAllUserData() {

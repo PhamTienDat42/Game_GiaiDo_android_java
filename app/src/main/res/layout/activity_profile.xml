@@ -338,19 +338,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.2" />
 
-        <Button
-            android:id="@+id/buttonAddQuestion"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:gravity="center"
-            android:text="Add Question"
-            android:textSize="18sp"
-            app:cornerRadius="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/showMap"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintVertical_bias="0.2" />
+<!--        <Button-->
+<!--            android:id="@+id/buttonAddQuestion"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:gravity="center"-->
+<!--            android:text="Add Question"-->
+<!--            android:textSize="18sp"-->
+<!--            app:cornerRadius="20dp"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/showMap"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintVertical_bias="0.2" />-->
 
         <Button
             android:id="@+id/signOutButton"
@@ -362,7 +362,7 @@
             app:cornerRadius="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/buttonAddQuestion"
+            app:layout_constraintTop_toBottomOf="@id/showMap"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintVertical_bias="0.2" />
 

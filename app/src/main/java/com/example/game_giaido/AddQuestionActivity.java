@@ -59,17 +59,16 @@ public class AddQuestionActivity extends AppCompatActivity {
         // Kiểm tra xem đã nhập đầy đủ thông tin chưa
         if (questionText.isEmpty() || answerA.isEmpty() || answerB.isEmpty() || answerC.isEmpty() || answerD.isEmpty() || correctAnswer.isEmpty()) {
             // Hiển thị thông báo cho người dùng rằng cần nhập đầy đủ thông tin
-            // Ví dụ: Toast.makeText(AddQuestionActivity.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddQuestionActivity.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
         } else {
             // Tạo đối tượng Question và thêm vào Firebase Realtime Database
             Question question = new Question(questionText, answerA, answerB, answerC, answerD, correctAnswer);
             databaseReference.push().setValue(question);
 
             // Hiển thị thông báo cho người dùng rằng câu hỏi đã được gửi thành công
-            // Ví dụ: Toast.makeText(AddQuestionActivity.this, "Câu hỏi đã được gửi thành công", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddQuestionActivity.this, "Câu hỏi đã được gửi thành công", Toast.LENGTH_SHORT).show();
 
             // Xóa nội dung của các EditText sau khi gửi câu hỏi thành công
-            Toast.makeText(this, "Da them cau hoi thanh cong!", Toast.LENGTH_LONG);
             clearEditTexts();
         }
     }
