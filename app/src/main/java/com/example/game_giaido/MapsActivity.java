@@ -93,8 +93,8 @@ public class MapsActivity extends AppCompatActivity implements
     private float[] orientationValues = new float[3];
     private List<Question> questionList = new ArrayList<>();
     private Map<Marker, Question> markerQuestionMap = new HashMap<>();
-
     private String selectedAnswer = null;
+    private int currentScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,14 +108,17 @@ public class MapsActivity extends AppCompatActivity implements
         searchView = findViewById(R.id.search);
         searchView.clearFocus();
 
-//        ButtonQuit = findViewById(R.id.btnquit);
-//        ButtonQuit.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+        currentScore = getIntent().getIntExtra("score", 0);
+        ButtonQuit = findViewById(R.id.btnquit);
+        ButtonQuit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("newScore", currentScore);
+                setResult(RESULT_OK, resultIntent);
+                finish(); // Kết thúc MapsActivity và trả về kết quả
+            }
+        });
 
         fusedClient = LocationServices.getFusedLocationProviderClient(this);
         getLocation();
@@ -677,7 +680,14 @@ public class MapsActivity extends AppCompatActivity implements
                 // Kiểm tra xem câu trả lời có đúng không
                 if (selectedAnswer != null && selectedAnswer.equals(question.getCorrectAnswer())) {
                     // Đúng
-                    Toast.makeText(MapsActivity.this, "Câu trả lời đúng!", Toast.LENGTH_SHORT).show();
+                    currentScore = getIntent().getIntExtra("score", 0);
+                    currentScore = currentScore + 10;
+                    Toast.makeText(MapsActivity.this, "Câu trả lời đúng!" + currentScore, Toast.LENGTH_SHORT).show();
+
+                    // Trả về kết quả cho ProfileActivity
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("newScore", currentScore);
+                    setResult(RESULT_OK, resultIntent);
                 } else {
                     // Sai
                     Toast.makeText(MapsActivity.this, "Câu trả lời sai!" + selectedAnswer, Toast.LENGTH_SHORT).show();

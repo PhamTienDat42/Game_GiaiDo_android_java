@@ -14,16 +14,16 @@ tools:context=".MapsActivity">
     tools:context=".MapsActivity"
     android:name="com.google.android.gms.maps.SupportMapFragment" />
 
-<!--    <Button-->
-<!--        android:id="@+id/btnquit"-->
-<!--        android:layout_width="113dp"-->
-<!--        android:layout_height="50dp"-->
-<!--        android:background="@drawable/white_background"-->
-<!--        android:text="Quit!"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/search"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:layout_marginStart="28dp" />-->
+    <Button
+        android:id="@+id/btnquit"
+        android:layout_width="113dp"
+        android:layout_height="50dp"
+        android:background="@drawable/white_background"
+        android:text="Quit!"
+        app:layout_constraintTop_toBottomOf="@+id/search"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="28dp" />
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search"

@@ -101,12 +101,12 @@ public class LoginActivity extends AppCompatActivity {
                         String usernameFromDB = snapshot.child(userUsername).child("username").getValue(String.class);
 
                         //lưu thông tin vào share preferences
-                        saveUserInfo(nameFromDB, emailFromDB, usernameFromDB, passwordFromDB);
+                        //saveUserInfo(nameFromDB, emailFromDB, usernameFromDB, passwordFromDB);
 
                         int rankFromDB = snapshot.child(userUsername).child("rank").getValue(Integer.class);
                         int scoreFromDB = snapshot.child(userUsername).child("score").getValue(Integer.class);
                         float timeFromDB = snapshot.child(userUsername).child("time").getValue(Float.class);
-                        //saveUserInfo2(nameFromDB, emailFromDB, usernameFromDB, passwordFromDB, rankFromDB, scoreFromDB, timeFromDB);
+                        saveUserInfo2(nameFromDB, emailFromDB, usernameFromDB, passwordFromDB, rankFromDB, scoreFromDB, timeFromDB);
 
                         Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
 

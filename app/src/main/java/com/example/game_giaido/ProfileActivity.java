@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -56,8 +58,9 @@ public class ProfileActivity extends AppCompatActivity {
         showMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(ProfileActivity.this, MapsActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(ProfileActivity.this, MapsActivity.class);
+//                startActivity(intent);
+                passUserDataToGame();
             }
         });
 
@@ -121,7 +124,6 @@ public class ProfileActivity extends AppCompatActivity {
                     intent.putExtra("password", passwordFromDB);
 
                     startActivity(intent);
-
                 }
             }
 
@@ -131,4 +133,70 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void passUserDataToGame() {
+        String userUsername = profileUsername.getText().toString().trim();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+        Query checkUserDatabase = reference.orderByChild("username").equalTo(userUsername);
+
+        checkUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Integer scoreDB = snapshot.child(userUsername).child("score").getValue(Integer.class);
+                    String usernameFromDB = snapshot.child(userUsername).child("username").getValue(String.class);
+
+                    Intent intent = new Intent(ProfileActivity.this, MapsActivity.class);
+
+                    intent.putExtra("score", scoreDB);
+                    intent.putExtra("username", usernameFromDB);
+
+                    startActivityForResult(intent, 1); // Sử dụng startActivityForResult để nhận kết quả từ MapsActivity
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                // Nhận dữ liệu trả về từ MapsActivity
+                int newScore = data.getIntExtra("newScore", 0);
+
+                // Cập nhật điểm trên Firebase
+                updateScoreOnFirebase(profileUsername.getText().toString(), newScore);
+
+                // Cập nhật điểm trên giao diện
+                profileScore.setText(String.valueOf(newScore));
+            }
+        }
+    }
+
+    private void updateScoreOnFirebase(String username, int newScore) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(username);
+
+        userRef.child("score").setValue(newScore)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Điểm đã được cập nhật thành công
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Lỗi khi cập nhật điểm
+                    }
+                });
+    }
+
 }
