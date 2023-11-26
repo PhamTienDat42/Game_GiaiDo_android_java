@@ -25,6 +25,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
@@ -53,6 +55,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.logging.Logger;
 
 //public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
 //        GoogleMap.OnMyLocationClickListener{
@@ -193,23 +196,14 @@ public class MapsActivity extends AppCompatActivity implements
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        //gMap.setMyLocationEnabled(true);
+        gMap.setMyLocationEnabled(true);
 
         // Bật Zoom Controls
-        //gMap.getUiSettings().setZoomControlsEnabled(true);
+        gMap.getUiSettings().setZoomControlsEnabled(true);
 
         // Enable the compass
         googleMap.getUiSettings().setCompassEnabled(true);
 
-//        LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-//        MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
-//        googleMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng));
-//        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
-//        googleMap.addMarker(markerOptions);
-//
-//
-//        // Tạo thêm 3 marker ở các vị trí cách 500m
-//        createMarkersAroundCurrentLocation(googleMap);
         if (currentLocation != null) {
             LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
             MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
@@ -221,7 +215,15 @@ public class MapsActivity extends AppCompatActivity implements
             createMarkersAroundCurrentLocation(googleMap);
         } else {
             // Xử lý trường hợp currentLocation là null, có thể thông báo lỗi hoặc thực hiện hành động phù hợp
-            Toast.makeText(this,"Khong tim duoc current location!", Toast.LENGTH_LONG);
+            //Toast.makeText(this,"Khong tim duoc current location!", Toast.LENGTH_LONG);
+            LatLng currentLatLng = new LatLng(20.9847, 105.8386);
+            MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title("My Current Location");
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+            googleMap.addMarker(markerOptions);
+
+            // Tạo thêm 3 marker ở các vị trí cách 500m
+            createMarkersAroundCurrentLocation(googleMap);
         }
     }
 
@@ -269,7 +271,7 @@ public class MapsActivity extends AppCompatActivity implements
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
-                    openQuizDialog(Gravity.CENTER);
+                openQuizDialog(Gravity.CENTER);
                 return false;
             }
         });
