@@ -93,6 +93,7 @@ public class MapsActivity extends AppCompatActivity implements
     private Map<Marker, Question> markerQuestionMap = new HashMap<>();
     private String selectedAnswer = null;
     private int currentScore;
+    private Marker selectedMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,17 +157,17 @@ public class MapsActivity extends AppCompatActivity implements
             }
         });
 
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-        if (accelerometer != null && magnetometer != null) {
-            sensorManager.registerListener(accelerometerListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-            sensorManager.registerListener(magnetometerListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
-        } else {
-            // Xử lý trường hợp thiết bị không hỗ trợ cảm biến
-            Toast.makeText(this, "Thiết bị không hỗ trợ cảm biến accelerometer hoặc magnetometer.", Toast.LENGTH_SHORT).show();
-        }
+//        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+//        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+//        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+//
+//        if (accelerometer != null && magnetometer != null) {
+//            sensorManager.registerListener(accelerometerListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+//            sensorManager.registerListener(magnetometerListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+//        } else {
+//            // Xử lý trường hợp thiết bị không hỗ trợ cảm biến
+//            Toast.makeText(this, "Thiết bị không hỗ trợ cảm biến accelerometer hoặc magnetometer.", Toast.LENGTH_SHORT).show();
+//        }
     }
 
     @Override
@@ -181,6 +182,7 @@ public class MapsActivity extends AppCompatActivity implements
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 System.arraycopy(event.values, 0, accelerometerValues, 0, 3);
+                updateCompassOrientation();
             }
         }
 
@@ -407,6 +409,9 @@ public class MapsActivity extends AppCompatActivity implements
                         // Lấy câu hỏi tương ứng với marker được chọn
                         Question selectedQuestion = markerQuestionMap.get(marker);
 
+                        // Lưu trữ marker được chọn vào biến toàn cục
+                        selectedMarker = marker;
+
                         // Hiển thị dialog với câu hỏi từ Firebase
                         openQuizDialog(Gravity.CENTER, selectedQuestion);
                         return false;
@@ -567,5 +572,13 @@ public class MapsActivity extends AppCompatActivity implements
 
         // Hiển thị dialog
         dialog.show();
+
+        // Ẩn đi marker đã được chọn
+        if (selectedMarker != null) {
+            selectedMarker.remove();
+        }
+
+        // Đặt lại biến toàn cục để tránh ẩn đi nhiều lần
+        selectedMarker = null;
     }
 }
