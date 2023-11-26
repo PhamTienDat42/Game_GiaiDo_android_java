@@ -5,7 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -32,6 +35,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -50,6 +54,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.List;
@@ -72,6 +81,13 @@ public class MapsActivity extends AppCompatActivity implements
     private static final int REQUEST_CODE = 101;
     SearchView searchView;
     Button ButtonQuit;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private Sensor magnetometer;
+    private float[] accelerometerValues = new float[3];
+    private float[] magnetometerValues = new float[3];
+    private float[] rotationMatrix = new float[9];
+    private float[] orientationValues = new float[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +147,60 @@ public class MapsActivity extends AppCompatActivity implements
                 return false;
             }
         });
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        if (accelerometer != null && magnetometer != null) {
+            sensorManager.registerListener(accelerometerListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(magnetometerListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+        } else {
+            // Xử lý trường hợp thiết bị không hỗ trợ cảm biến
+            Toast.makeText(this, "Thiết bị không hỗ trợ cảm biến accelerometer hoặc magnetometer.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sensorManager.unregisterListener(accelerometerListener);
+        sensorManager.unregisterListener(magnetometerListener);
+    }
+
+    private final SensorEventListener accelerometerListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                System.arraycopy(event.values, 0, accelerometerValues, 0, 3);
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // Xử lý thay đổi độ chính xác của cảm biến nếu cần
+        }
+    };
+
+    private final SensorEventListener magnetometerListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                System.arraycopy(event.values, 0, magnetometerValues, 0, 3);
+                updateCompassOrientation();
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // Xử lý thay đổi độ chính xác của cảm biến nếu cần
+        }
+    };
+
+    private void updateCompassOrientation() {
+        SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerValues, magnetometerValues);
+        float azimuth = (float) Math.toDegrees(SensorManager.getOrientation(rotationMatrix, orientationValues)[0]);
+        updateMapBearing(azimuth);
     }
 
     // Phương thức cập nhật hướng trên Google Map
@@ -143,6 +213,22 @@ public class MapsActivity extends AppCompatActivity implements
                             .tilt(gMap.getCameraPosition().tilt)
                             .build()));
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (accelerometer != null && magnetometer != null) {
+            sensorManager.registerListener(accelerometerListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(magnetometerListener, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(accelerometerListener);
+        sensorManager.unregisterListener(magnetometerListener);
     }
 
     private void getLocation() {
@@ -327,7 +413,7 @@ public class MapsActivity extends AppCompatActivity implements
         return false;
     }
 
-    private void openQuizDialog(int gravity){
+    private void openQuizDialog1(int gravity){
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.layout_dialog_quiz);
@@ -351,4 +437,82 @@ public class MapsActivity extends AppCompatActivity implements
         }
         dialog.show();
     }
+
+    private void openQuizDialog(int gravity) {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_dialog_quiz);
+
+        Window window = dialog.getWindow();
+        if (window == null) {
+            return;
+        }
+
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.gravity = gravity;
+        window.setAttributes(windowAttributes);
+
+        if (Gravity.CENTER == gravity) {
+            dialog.setCancelable(true);
+        } else {
+            dialog.setCancelable(false);
+        }
+
+        // Ánh xạ các thành phần trong layout của dialog
+        TextView questionTextView = dialog.findViewById(R.id.question);
+        Button answerA = dialog.findViewById(R.id.ans_A);
+        Button answerB = dialog.findViewById(R.id.ans_B);
+        Button answerC = dialog.findViewById(R.id.ans_C);
+        Button answerD = dialog.findViewById(R.id.ans_D);
+        Button submitButton = dialog.findViewById(R.id.submit_btn);
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("questions");
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                long count = dataSnapshot.getChildrenCount();
+                Random random = new Random();
+                long randomNumber = random.nextInt((int) count);
+
+                DataSnapshot randomQuestionSnapshot = dataSnapshot.getChildren().iterator().next();
+
+                // Lấy dữ liệu của câu hỏi từ Firebase
+                String questionText = randomQuestionSnapshot.child("questionText").getValue(String.class);
+                String answerAText = randomQuestionSnapshot.child("answerA").getValue(String.class);
+                String answerBText = randomQuestionSnapshot.child("answerB").getValue(String.class);
+                String answerCText = randomQuestionSnapshot.child("answerC").getValue(String.class);
+                String answerDText = randomQuestionSnapshot.child("answerD").getValue(String.class);
+
+                // Hiển thị dữ liệu lên TextView và Button trong dialog
+                questionTextView.setText(questionText);
+                answerA.setText("A. " + answerAText);
+                answerB.setText("B. " + answerBText);
+                answerC.setText("C. " + answerCText);
+                answerD.setText("D. " + answerDText);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Error: " + databaseError.getMessage());
+            }
+        });
+
+        // Xử lý sự kiện khi người dùng nhấn nút Trả lời trong dialog
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Xử lý logic khi người dùng trả lời câu hỏi
+                // Ví dụ: Đóng dialog sau khi người dùng đã trả lời
+                dialog.dismiss();
+            }
+        });
+
+        // Hiển thị dialog
+        dialog.show();
+    }
+
 }

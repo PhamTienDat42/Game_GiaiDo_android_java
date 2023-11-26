@@ -103,12 +103,20 @@ public class LoginActivity extends AppCompatActivity {
                         //lưu thông tin vào share preferences
                         saveUserInfo(nameFromDB, emailFromDB, usernameFromDB, passwordFromDB);
 
+                        int rankFromDB = snapshot.child(userUsername).child("rank").getValue(Integer.class);
+                        int scoreFromDB = snapshot.child(userUsername).child("score").getValue(Integer.class);
+                        float timeFromDB = snapshot.child(userUsername).child("time").getValue(Float.class);
+                        //saveUserInfo2(nameFromDB, emailFromDB, usernameFromDB, passwordFromDB, rankFromDB, scoreFromDB, timeFromDB);
+
                         Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
 
                         intent.putExtra("name", nameFromDB);
                         intent.putExtra("email", emailFromDB);
                         intent.putExtra("username", usernameFromDB);
                         intent.putExtra("password", passwordFromDB);
+                        intent.putExtra("rank", rankFromDB);
+                        intent.putExtra("score", scoreFromDB);
+                        intent.putExtra("time", timeFromDB);
 
                         startActivity(intent);
                     } else {
@@ -140,4 +148,18 @@ public class LoginActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    public void saveUserInfo2(String name, String email, String username, String password, int rank, int score, float time) {
+        SharedPreferences preferences = getSharedPreferences("user_info", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString("name", name);
+        editor.putString("email", email);
+        editor.putString("username", username);
+        editor.putString("password", password);
+        editor.putInt("rank", rank);
+        editor.putInt("score", score);
+        editor.putFloat("time", time);
+
+        editor.apply();
+    }
 }

@@ -45,7 +45,7 @@ public class SignupActivity extends AppCompatActivity {
                 String username = signupUsername.getText().toString();
                 String password = signupPassword.getText().toString();
 
-                HelperClass helperClass = new HelperClass(name, email, username, password);
+                HelperClass helperClass = new HelperClass(name, email, username, password, 0, 0, 0.0f);
                 reference.child(username).setValue(helperClass);
 
                 Toast.makeText(SignupActivity.this, "You have signup successfully!", Toast.LENGTH_SHORT).show();

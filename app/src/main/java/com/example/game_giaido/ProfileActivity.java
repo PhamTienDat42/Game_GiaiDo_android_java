@@ -20,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    TextView profileName, profileEmail, profileUsername, profilePassword;
+    TextView profileName, profileEmail, profileUsername, profilePassword, profileRank, profileScore, profileTime;
     TextView titleName, titleUsername;
     Button editProfile, showMap, showMapFragment;
 
@@ -35,13 +35,16 @@ public class ProfileActivity extends AppCompatActivity {
         profileEmail = findViewById(R.id.profileEmail);
         profileUsername = findViewById(R.id.profileUsername);
         profilePassword = findViewById(R.id.profilePassword);
+        profileRank = findViewById(R.id.rank);
+        profileScore = findViewById(R.id.score);
+        profileTime = findViewById(R.id.time);
+
         titleName = findViewById(R.id.titleName);
         titleUsername = findViewById(R.id.titleUsername);
         editProfile = findViewById(R.id.editButton);
         showMap = findViewById(R.id.showMap);
 
         showAllUserData();
-        //showAllUserData2();
 
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,24 +60,19 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button buttonAddQuestion = findViewById(R.id.buttonAddQuestion);
+        buttonAddQuestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Chuyển sang AddQuestionActivity
+                Intent intent = new Intent(ProfileActivity.this, AddQuestionActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
-    public void showAllUserData(){
-        Intent intent = getIntent();
-        String nameUser = intent.getStringExtra("name");
-        String emailUser = intent.getStringExtra("email");
-        String usernameUser = intent.getStringExtra("username");
-        String passwordUser = intent.getStringExtra("password");
-
-        titleName.setText(nameUser);
-        titleUsername.setText(usernameUser);
-        profileName.setText(nameUser);
-        profileEmail.setText(emailUser);
-        profileUsername.setText(usernameUser);
-        profilePassword.setText(passwordUser);
-    }
-
-    public void showAllUserData2() {
+    public void showAllUserData() {
         SharedPreferences preferences = getSharedPreferences("user_info", MODE_PRIVATE);
 
         if (preferences.contains("username")) {
@@ -82,6 +80,9 @@ public class ProfileActivity extends AppCompatActivity {
             String emailUser = preferences.getString("email", "");
             String usernameUser = preferences.getString("username", "");
             String passwordUser = preferences.getString("password", "");
+            int rankUser = preferences.getInt("rank", 0);
+            int scoreUser = preferences.getInt("score", 0);
+            float timeUser = preferences.getFloat("time", 0.0f);
 
             titleName.setText(nameUser);
             titleUsername.setText(usernameUser);
@@ -89,6 +90,9 @@ public class ProfileActivity extends AppCompatActivity {
             profileEmail.setText(emailUser);
             profileUsername.setText(usernameUser);
             profilePassword.setText(passwordUser);
+            profileRank.setText(String.valueOf(rankUser));
+            profileScore.setText(String.valueOf(scoreUser));
+            profileTime.setText(String.valueOf(timeUser));
         }
     }
 

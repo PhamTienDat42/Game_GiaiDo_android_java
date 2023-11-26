@@ -85,7 +85,7 @@
                 <TextView
                     android:layout_width="80dp"
                     android:layout_height="60dp"
-                    android:id="@+id/postsNumber"
+                    android:id="@+id/rank"
                     android:text="27"
                     android:gravity="center"
                     android:textAlignment="center"
@@ -97,7 +97,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/posts"
-                    android:text="Posts"
+                    android:text="RANK"
                     android:textAlignment="center"
                     android:textColor="@color/lavender"
                     android:textSize="16sp"/>
@@ -116,7 +116,7 @@
                 <TextView
                     android:layout_width="80dp"
                     android:layout_height="60dp"
-                    android:id="@+id/followersNo"
+                    android:id="@+id/score"
                     android:text="455"
                     android:gravity="center"
                     android:textAlignment="center"
@@ -128,7 +128,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/followers"
-                    android:text="Followers"
+                    android:text="SCORE"
                     android:textAlignment="center"
                     android:textColor="@color/lavender"
                     android:textSize="16sp"/>
@@ -147,7 +147,7 @@
                 <TextView
                     android:layout_width="80dp"
                     android:layout_height="60dp"
-                    android:id="@+id/followingNo"
+                    android:id="@+id/time"
                     android:text="413"
                     android:gravity="center"
                     android:textAlignment="center"
@@ -159,7 +159,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/following"
-                    android:text="Following"
+                    android:text="TIME"
                     android:textAlignment="center"
                     android:textColor="@color/lavender"
                     android:textSize="16sp"/>
@@ -337,5 +337,20 @@
         app:layout_constraintTop_toBottomOf="@id/editButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.2" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/buttonAddQuestion"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:text="Add Question"
+            android:textSize="18sp"
+            app:cornerRadius="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/showMap"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
